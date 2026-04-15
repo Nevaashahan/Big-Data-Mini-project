@@ -1,0 +1,12 @@
+.idea/
+.vscode/
+*.iml
+*.class
+*.log
+.env
+__pycache__/
+*.pyc
+.venv/
+target/
+logs/
+postgres-data/
