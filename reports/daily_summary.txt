@@ -1,0 +1,23 @@
+E-Commerce Daily Summary
+Report date: 2026-04-15
+Generated at: 2026-04-16T06:44:41.899871 UTC
+
+Top 5 Most Viewed Products
+--------------------------
+1. P1002 - 564 views
+2. P1001 - 554 views
+3. P1004 - 389 views
+4. P1005 - 367 views
+5. P1006 - 349 views
+
+User Segmentation
+-----------------
+Buyer: 80
+Interested Buyer: 20
+
+Conversion by Category
+----------------------
+Mobile Phones: views=1118, purchases=69, conversion_rate=0.0617
+Accessories: views=349, purchases=20, conversion_rate=0.0573
+Audio: views=346, purchases=18, conversion_rate=0.0520
+Laptops: views=756, purchases=38, conversion_rate=0.0503

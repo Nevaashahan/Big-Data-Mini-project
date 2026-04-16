@@ -9,13 +9,15 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE TABLE IF NOT EXISTS clickstream_events (
     id BIGSERIAL PRIMARY KEY,
-    event_id UUID NOT NULL UNIQUE,
+    event_id VARCHAR(100) NOT NULL UNIQUE,
     user_id VARCHAR(50) NOT NULL,
     product_id VARCHAR(50) NOT NULL,
-    category VARCHAR(100) NOT NULL,
-    event_type VARCHAR(50) NOT NULL,
+    event_type VARCHAR(30) NOT NULL CHECK (event_type IN ('view', 'add_to_cart', 'purchase')),
     event_time TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_clickstream_product
+        FOREIGN KEY (product_id) REFERENCES products(id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS product_window_metrics (
@@ -74,6 +76,36 @@ CREATE TABLE IF NOT EXISTS daily_conversion_report (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT uq_daily_conversion_report UNIQUE (report_date, category)
 );
+
+CREATE INDEX IF NOT EXISTS idx_clickstream_events_event_time
+    ON clickstream_events(event_time);
+
+CREATE INDEX IF NOT EXISTS idx_clickstream_events_product_id
+    ON clickstream_events(product_id);
+
+CREATE INDEX IF NOT EXISTS idx_clickstream_events_user_id
+    ON clickstream_events(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_product_window_metrics_product_id
+    ON product_window_metrics(product_id);
+
+CREATE INDEX IF NOT EXISTS idx_product_window_metrics_window
+    ON product_window_metrics(window_start, window_end);
+
+CREATE INDEX IF NOT EXISTS idx_flash_sale_alerts_product_id
+    ON flash_sale_alerts(product_id);
+
+CREATE INDEX IF NOT EXISTS idx_flash_sale_alerts_created_at
+    ON flash_sale_alerts(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_daily_user_segments_report_date
+    ON daily_user_segments(report_date);
+
+CREATE INDEX IF NOT EXISTS idx_daily_top_products_report_date
+    ON daily_top_products(report_date);
+
+CREATE INDEX IF NOT EXISTS idx_daily_conversion_report_report_date
+    ON daily_conversion_report(report_date);
 
 INSERT INTO products (id, product_name, category, price, stock_qty) VALUES
 ('P1001', 'iPhone 15', 'Mobile Phones', 999.99, 20),

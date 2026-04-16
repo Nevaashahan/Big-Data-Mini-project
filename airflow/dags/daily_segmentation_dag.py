@@ -73,30 +73,34 @@ def build_daily_outputs():
     """
 
     conversion_sql = """
-        INSERT INTO daily_conversion_report (
-            report_date, category, total_views, total_purchases, conversion_rate
-        )
-        SELECT
-            %(report_date)s AS report_date,
-            category,
-            COUNT(*) FILTER (WHERE event_type = 'view') AS total_views,
-            COUNT(*) FILTER (WHERE event_type = 'purchase') AS total_purchases,
-            CASE
-                WHEN COUNT(*) FILTER (WHERE event_type = 'view') = 0 THEN 0
-                ELSE ROUND(
-                    (COUNT(*) FILTER (WHERE event_type = 'purchase'))::numeric
-                    / NULLIF(COUNT(*) FILTER (WHERE event_type = 'view'), 0),
-                    4
-                )
-            END AS conversion_rate
-        FROM clickstream_events
-        WHERE DATE(event_time) = %(report_date)s
-        GROUP BY category
-        ON CONFLICT (report_date, category)
-        DO UPDATE SET
-            total_views = EXCLUDED.total_views,
-            total_purchases = EXCLUDED.total_purchases,
-            conversion_rate = EXCLUDED.conversion_rate
+    DELETE FROM daily_conversion_report
+    WHERE report_date = %(report_date)s;
+
+    INSERT INTO daily_conversion_report (
+        report_date,
+        category,
+        total_views,
+        total_purchases,
+        conversion_rate
+    )
+    SELECT
+        e.event_time::date AS report_date,
+        p.category,
+        COUNT(*) FILTER (WHERE e.event_type = 'view') AS total_views,
+        COUNT(*) FILTER (WHERE e.event_type = 'purchase') AS total_purchases,
+        CASE
+            WHEN COUNT(*) FILTER (WHERE e.event_type = 'view') = 0 THEN 0
+            ELSE ROUND(
+                (COUNT(*) FILTER (WHERE e.event_type = 'purchase'))::numeric
+                / NULLIF(COUNT(*) FILTER (WHERE e.event_type = 'view'), 0),
+                4
+            )
+        END AS conversion_rate
+    FROM clickstream_events e
+    JOIN products p
+    ON p.id = e.product_id
+    WHERE e.event_time::date = %(report_date)s
+    GROUP BY e.event_time::date, p.category;
     """
 
     summary_sql = """
