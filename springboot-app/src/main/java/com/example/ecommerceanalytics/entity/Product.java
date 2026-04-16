@@ -28,7 +28,7 @@ public class Product {
     @Column(nullable = false)
     private String category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
     @Column(name = "stock_qty", nullable = false)

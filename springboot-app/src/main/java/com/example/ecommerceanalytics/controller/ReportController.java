@@ -1,5 +1,6 @@
 package com.example.ecommerceanalytics.controller;
 
+import com.example.ecommerceanalytics.entity.DailyConversionReport;
 import com.example.ecommerceanalytics.entity.DailyTopProduct;
 import com.example.ecommerceanalytics.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,5 +28,15 @@ public class ReportController {
     ) {
         LocalDate effectiveDate = reportDate != null ? reportDate : LocalDate.now();
         return reportService.getTopProducts(effectiveDate);
+    }
+
+    @GetMapping("/conversion")
+    @Operation(summary = "Get conversion report by date", description = "Returns category-level conversion metrics for a given report date")
+    public List<DailyConversionReport> getConversionReport(
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate reportDate
+    ) {
+        LocalDate effectiveDate = reportDate != null ? reportDate : LocalDate.now();
+        return reportService.getConversionReport(effectiveDate);
     }
 }

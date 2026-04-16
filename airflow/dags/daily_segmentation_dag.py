@@ -4,6 +4,7 @@ import os
 import psycopg2
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.operators.python import get_current_context
 
 POSTGRES_CONFIG = {
     "host": os.getenv("POSTGRES_HOST", "postgres"),
@@ -19,9 +20,20 @@ def get_connection():
     return psycopg2.connect(**POSTGRES_CONFIG)
 
 
+def resolve_report_date():
+    context = get_current_context()
+    dag_run = context.get("dag_run")
+    dag_conf = dag_run.conf if dag_run and dag_run.conf else {}
+    configured_date = dag_conf.get("report_date")
+
+    if configured_date:
+        return datetime.strptime(configured_date, "%Y-%m-%d").date()
+
+    return (datetime.utcnow() - timedelta(days=1)).date()
+
 
 def build_daily_outputs():
-    report_date = (datetime.utcnow() - timedelta(days=1)).date()
+    report_date = resolve_report_date()
 
     user_segment_sql = """
         INSERT INTO daily_user_segments (
