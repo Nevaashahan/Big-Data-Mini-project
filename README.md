@@ -1,4 +1,5 @@
 # E-Commerce Clickstream & Inventory Watch
+# Group Members EG/2020/4023  EG/2020/4098  EG/2020/4227
 
 Starter project for the Applied Big Data Engineering mini project.
 
